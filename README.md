@@ -33,7 +33,7 @@ if (Meteor.isClient) {
       return Session.get('sub1');
     });
 
-    Deps.autorun(function (c) {
+    Tracker.autorun(function (c) {
       // reactive ready() function returns true if all functions in the waitlist
       // have returned true and false otherwise
       if (controller.ready()) {

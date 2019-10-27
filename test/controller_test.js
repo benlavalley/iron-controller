@@ -4,7 +4,7 @@ String.prototype.compact = function () {
 
 var ReactiveVar = function (value) {
   this._value = value;
-  this._dep = new Deps.Dependency;
+  this._dep = new Tracker.Dependency;
 };
 
 ReactiveVar.prototype.get = function () {
@@ -21,7 +21,7 @@ ReactiveVar.prototype.set = function (value) {
 
 ReactiveVar.prototype.clear = function () {
   this._value = null;
-  this._dep = new Deps.Dependency;
+  this._dep = new Tracker.Dependency;
 };
 
 // a reactive template variable we can use
@@ -44,7 +44,7 @@ var withRenderedTemplate = function (template, callback) {
   withDiv(function (el) {
     template = _.isString(template) ? Template[template] : template;
     Blaze.render(template, el);
-    Deps.flush();
+    Tracker.flush();
     callback(el);
   });
 };
@@ -96,17 +96,17 @@ Tinytest.add('Controller - change layout controllers', function (test) {
   withRenderedTemplate(layout.create(), function (el) {
     // start off with no controller
     layout.render('ControllerChangeTest');
-    Deps.flush();
+    Tracker.flush();
     test.equal(el.innerHTML.compact(), "Controller-");
 
     // change the controller on the layout
     var c1 = new Iron.Controller({layout: layout, id: 1});
-    Deps.flush();
+    Tracker.flush();
     test.equal(el.innerHTML.compact(), "Controller-1");
 
     // now swap out the controller
     var c2 = new Iron.Controller({layout: layout, id: 2});
-    Deps.flush();
+    Tracker.flush();
     test.equal(el.innerHTML.compact(), "Controller-2");
   });
 });
@@ -130,12 +130,12 @@ Tinytest.add('Controller - Iron.controller() lookup in helpers', function (test)
   withRenderedTemplate(layout.create(), function (el) {
     // start off with no controller
     layout.render('ControllerTest');
-    Deps.flush();
+    Tracker.flush();
     test.equal(el.innerHTML.compact(), "Parent-Child-");
 
     // set the controller on the layout
     var c1 = new Iron.Controller({layout: layout, id: 1});
-    Deps.flush();
+    Tracker.flush();
 
     // Iron.controller() should work for child templates and parent
     // templates
@@ -158,7 +158,7 @@ Tinytest.add('Controller - Iron.controller() lookup in event handlers', function
     test.equal(el.innerHTML.compact(), "<div>TriggerClick</div>");
 
     var c1 = new Iron.Controller({layout: layout, id: 1});
-    Deps.flush();
+    Tracker.flush();
 
     $(el).find('div').trigger('click');
     test.isTrue(lastEvent, 'last event is set');
@@ -177,17 +177,17 @@ Tinytest.add('Controller - reactive state variables', function (test) {
   var layout = new Iron.Layout;
   withRenderedTemplate(layout.create(), function (el) {
     layout.render('ReactiveStateTest');
-    Deps.flush();
+    Tracker.flush();
     test.equal(el.innerHTML.compact(), "");
 
     var c = new Iron.Controller({layout: layout});
     c.state.set('postId', 1);
-    Deps.flush();
+    Tracker.flush();
     test.equal(el.innerHTML.compact(), "1");
 
     var c = new Iron.Controller({layout: layout});
     c.state.set('postId', 2);
-    Deps.flush();
+    Tracker.flush();
     test.equal(el.innerHTML.compact(), "2");
   });
 });

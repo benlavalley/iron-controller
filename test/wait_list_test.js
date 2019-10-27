@@ -2,7 +2,7 @@ var WaitList = Iron.WaitList;
 
 ReadyHandle = function () {
   this._ready = false;
-  this._dep = new Deps.Dependency;
+  this._dep = new Tracker.Dependency;
 };
 
 ReadyHandle.prototype.set = function (value) {
@@ -21,14 +21,14 @@ Tinytest.add('WaitList - all', function (test) {
   var h1 = new ReadyHandle;
   var h2 = new ReadyHandle;
 
-  var comp = Deps.autorun(function (c) {
+  var comp = Tracker.autorun(function (c) {
     list.wait(function () { return h1.ready(); });
     list.wait(function () { return h2.ready(); });
   });
 
   var result;
 
-  Deps.autorun(function (c) {
+  Tracker.autorun(function (c) {
     result = list.ready();
   });
 
@@ -36,17 +36,17 @@ Tinytest.add('WaitList - all', function (test) {
   test.equal(list._notReadyCount, 2);
 
   h1.set(true);
-  Deps.flush();
+  Tracker.flush();
   test.isFalse(result, 'list should still not be ready');
   test.equal(list._notReadyCount, 1);
 
   h2.set(true)
-  Deps.flush();
+  Tracker.flush();
   test.isTrue(result, 'list should be ready');
   test.equal(list._notReadyCount, 0);
 
   test.equal(list._comps.length, 2);
   comp.invalidate();
-  Deps.flush();
+  Tracker.flush();
   test.equal(list._comps.length, 2, 'comps list should not grow');
 });

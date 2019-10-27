@@ -3,7 +3,7 @@ if (Meteor.isClient) {
   handle = new Blaze.ReactiveVar(false);
   count = 0;
 
-  Deps.autorun(function (c) {
+  Tracker.autorun(function (c) {
     if (count > 5) return;
 
     count++;
